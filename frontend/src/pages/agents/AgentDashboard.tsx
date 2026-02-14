@@ -2,7 +2,6 @@ import { For, createSignal } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
-import { Input } from "../../design-system/components/Input";
 import { PulseIndicator } from "../../effects/index";
 import { Server, Shield, Activity, Download, Plus, Search, Terminal, Settings2 } from "lucide-solid";
 import { agentStore } from "../../stores/registry";
@@ -70,7 +69,7 @@ export default function AgentDashboard() {
             />
           </div>
           <div class="flex items-center gap-2">
-            <Badge variant="outline" class="cursor-pointer">All: {agents().length}</Badge>
+            <Badge variant="muted" class="cursor-pointer">All: {agents().length}</Badge>
             <Badge variant="success" class="cursor-pointer">Online: {agents().filter(a => a.status === 'online').length}</Badge>
             <Badge variant="warning" class="cursor-pointer">Throttled: {agents().filter(a => a.status === 'throttled').length}</Badge>
             <Badge variant="muted" class="cursor-pointer">Offline: {agents().filter(a => a.status === 'offline').length}</Badge>

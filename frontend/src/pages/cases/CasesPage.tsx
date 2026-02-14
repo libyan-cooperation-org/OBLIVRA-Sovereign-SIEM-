@@ -7,7 +7,7 @@ import type { Case } from "../../stores/registry";
 import { FileText, Plus, Clock, User, AlertTriangle, CheckCircle } from "lucide-solid";
 import { Modal } from "../../design-system/components/Modal";
 
-const sevColor = (s: string) => ({ critical: "error", high: "warning", medium: "warning", low: "success" } as any)[s] ?? "muted";
+const sevColor = (s: string) => ({ critical: "error", high: "warning", medium: "warning", low: "success", info: "info" } as any)[s] ?? "muted";
 const statColor = (s: string) => ({ open: "error", in_progress: "warning", resolved: "success", closed: "muted" } as any)[s] ?? "muted";
 
 export default function CasesPage() {
@@ -52,30 +52,32 @@ export default function CasesPage() {
       <div class="grid gap-4">
         <For each={cases()}>
           {(c) => (
-            <Card class="hover:bg-white/[0.08] transition-colors cursor-pointer" onClick={() => setSelected(c)}>
-              <div class="flex items-start gap-4">
-                <div class={`p-2.5 rounded-xl shrink-0`} style={{ background: { critical: "rgba(239,68,68,0.1)", high: "rgba(249,115,22,0.1)", medium: "rgba(99,102,241,0.1)", low: "rgba(34,197,94,0.1)" }[c.severity] }}>
-                  <FileText size={20} class={{ critical: "text-red-400", high: "text-amber-400", medium: "text-accent", low: "text-emerald-400" }[c.severity]} />
-                </div>
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-center gap-2 mb-1 flex-wrap">
-                    <h3 class="font-semibold text-white">{c.title}</h3>
-                    <Badge variant={sevColor(c.severity)}>{c.severity}</Badge>
-                    <Badge variant={statColor(c.status)}>{c.status.replace("_", " ")}</Badge>
+            <div onClick={() => setSelected(c)}>
+              <Card class="hover:bg-white/[0.08] transition-colors cursor-pointer">
+                <div class="flex items-start gap-4">
+                  <div class={`p-2.5 rounded-xl shrink-0`} style={{ background: { critical: "rgba(239,68,68,0.1)", high: "rgba(249,115,22,0.1)", medium: "rgba(99,102,241,0.1)", low: "rgba(34,197,94,0.1)", info: "rgba(6,182,212,0.1)" }[c.severity] }}>
+                    <FileText size={20} class={{ critical: "text-red-400", high: "text-amber-400", medium: "text-accent", low: "text-emerald-400", info: "text-cyan-400" }[c.severity]} />
                   </div>
-                  <p class="text-sm text-muted line-clamp-1">{c.description}</p>
-                  <div class="flex items-center gap-4 mt-2 text-xs text-muted">
-                    <span class="flex items-center gap-1"><User size={11} />{c.assignee}</span>
-                    <span class="flex items-center gap-1"><AlertTriangle size={11} />{c.alertCount} alerts</span>
-                    <span class="flex items-center gap-1"><Clock size={11} />Updated {new Date(c.updated).toLocaleDateString()}</span>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                      <h3 class="font-semibold text-white">{c.title}</h3>
+                      <Badge variant={sevColor(c.severity)}>{c.severity}</Badge>
+                      <Badge variant={statColor(c.status)}>{c.status.replace("_", " ")}</Badge>
+                    </div>
+                    <p class="text-sm text-muted line-clamp-1">{c.description}</p>
+                    <div class="flex items-center gap-4 mt-2 text-xs text-muted">
+                      <span class="flex items-center gap-1"><User size={11} />{c.assignee}</span>
+                      <span class="flex items-center gap-1"><AlertTriangle size={11} />{c.alertCount} alerts</span>
+                      <span class="flex items-center gap-1"><Clock size={11} />Updated {new Date(c.updated).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <div class="text-right shrink-0">
+                    <p class="text-xs text-muted">Created</p>
+                    <p class="text-sm font-mono text-secondary">{new Date(c.created).toLocaleDateString()}</p>
                   </div>
                 </div>
-                <div class="text-right shrink-0">
-                  <p class="text-xs text-muted">Created</p>
-                  <p class="text-sm font-mono text-secondary">{new Date(c.created).toLocaleDateString()}</p>
-                </div>
-              </div>
-            </Card>
+              </Card>
+            </div>
           )}
         </For>
       </div>

@@ -29,4 +29,4 @@ const [statusFilter, setStatusFilter] = createSignal<FIMEntry["status"] | "all">
 const filteredFiles = () => files().filter(f => statusFilter() === "all" || f.status === statusFilter());
 const changeCount = () => files().filter(f => f.status !== "clean").length;
 
-export const fimStore = { files, filteredFiles, statusFilter, setStatusFilter, changeCount };
+export const fimStore = { files, setFiles, filteredFiles, statusFilter, setStatusFilter, changeCount };

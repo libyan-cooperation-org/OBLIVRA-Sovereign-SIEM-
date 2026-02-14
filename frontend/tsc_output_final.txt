@@ -1,0 +1,3 @@
+﻿src/pages/fim/FIMPage.tsx(1,10): error TS6133: 'For' is declared but its value is never read.
+src/pages/hunting/HuntingWorkspace.tsx(79,34): error TS2304: Cannot find name 'Activity'.
+src/pages/livetail/LiveTail.tsx(3,1): error TS6133: 'Badge' is declared but its value is never read.

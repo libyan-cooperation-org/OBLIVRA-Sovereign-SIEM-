@@ -1,13 +1,12 @@
 import { For, createSignal } from "solid-js";
 import { Card } from "../../design-system/components/Card";
-import { Input } from "../../design-system/components/Input";
 import { Button } from "../../design-system/components/Button";
 import { Badge } from "../../design-system/components/Badge";
-import { Search, Filter, Download, Calendar, Terminal } from "lucide-solid";
+import { Download, Calendar, Terminal } from "lucide-solid";
 import { searchStore } from "../../stores/registry";
 
 export default function LogExplorer() {
-  const { searchQuery, setSearchQuery, searchResults, searchLoading, timeRange, setTimeRange } = searchStore;
+  const { searchQuery, setSearchQuery, searchResults, timeRange, setTimeRange } = searchStore;
   const [view, setView] = createSignal<"table" | "raw">("table");
 
   const handleSearch = () => {
@@ -62,10 +61,10 @@ export default function LogExplorer() {
 
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-xs font-semibold text-muted uppercase tracking-wider mr-2">Quick Filters:</span>
-          <Badge variant="outline" class="cursor-pointer hover:bg-white/5">source:system</Badge>
-          <Badge variant="outline" class="cursor-pointer hover:bg-white/5">level:ERROR</Badge>
-          <Badge variant="outline" class="cursor-pointer hover:bg-white/5">user:admin</Badge>
-          <Badge variant="outline" class="cursor-pointer hover:bg-accent/10 border-accent/20 text-accent">+ Add Filter</Badge>
+          <Badge variant="muted" class="cursor-pointer hover:bg-white/5">source:system</Badge>
+          <Badge variant="muted" class="cursor-pointer hover:bg-white/5">level:ERROR</Badge>
+          <Badge variant="muted" class="cursor-pointer hover:bg-white/5">user:admin</Badge>
+          <Badge variant="muted" class="cursor-pointer hover:bg-accent/10 border-accent/20 text-accent">+ Add Filter</Badge>
         </div>
       </Card>
 

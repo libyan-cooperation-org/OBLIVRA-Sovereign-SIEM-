@@ -1,4 +1,4 @@
-import { For, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Terminal, Send, History, Code, Copy, ChevronRight, Zap } from "lucide-solid";
@@ -16,7 +16,7 @@ export default function APILab() {
                     <p class="text-sm text-muted mt-0.5">Developer tools for raw ingestion testing and API exploration</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <Badge variant="outline" class="font-mono selection:bg-accent/20">X-API-KEY: OBL-****-****</Badge>
+                    <Badge variant="muted" class="font-mono selection:bg-accent/20">X-API-KEY: OBL-****-****</Badge>
                 </div>
             </div>
 

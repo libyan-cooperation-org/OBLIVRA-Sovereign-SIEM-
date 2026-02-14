@@ -1,8 +1,8 @@
-import { createSignal, For } from "solid-js";
+import { createSignal } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
-import { Shield, GitCommit, Search, RefreshCw, FileCheck, AlertCircle } from "lucide-solid";
+import { Shield, GitCommit, Search, RefreshCw, FileCheck } from "lucide-solid";
 import { forensicsStore } from "../../stores/registry";
 
 export default function MerkleExplorer() {
@@ -86,7 +86,7 @@ export default function MerkleExplorer() {
                     <h3 class="font-semibold text-sm">Merkle Leaf Visualization</h3>
                     <div class="flex items-center gap-2">
                         <input type="text" placeholder="Search leaf hash..." class="bg-base text-xs border border-white/10 rounded px-2 py-1 outline-none focus:border-accent" />
-                        <Button variant="outline" size="xs"><Search size={12} /></Button>
+                        <Button variant="outline" size="sm"><Search size={12} /></Button>
                     </div>
                 </div>
                 <div class="p-6 bg-black/20 flex flex-col items-center">

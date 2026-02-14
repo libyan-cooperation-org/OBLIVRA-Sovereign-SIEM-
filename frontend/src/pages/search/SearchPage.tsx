@@ -2,9 +2,7 @@ import { createSignal, For, Show } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
-import { Input } from "../../design-system/components/Input";
-import { Search, Filter, Clock, Download, Bookmark, ChevronDown, ChevronRight } from "lucide-solid";
-import { searchStore } from "../../stores/registry";
+import { Search, Clock, Download, Bookmark, ChevronDown, ChevronRight } from "lucide-solid";
 import type { LogEvent } from "../../stores/registry";
 
 const LEVELS: Record<string, "error" | "warning" | "info" | "muted" | "success"> = {

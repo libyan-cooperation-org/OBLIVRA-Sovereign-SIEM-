@@ -1,4 +1,4 @@
-import { For, createSignal } from "solid-js";
+import { createSignal } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Fingerprint, FileText, AlertTriangle, Shield, Search, RefreshCw, HardDrive } from "lucide-solid";

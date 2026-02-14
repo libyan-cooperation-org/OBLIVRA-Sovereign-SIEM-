@@ -1,7 +1,7 @@
 import { For } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
-import { CheckCircle2, AlertCircle, FileText, BarChart3, ShieldCheck, Zap, Globe } from "lucide-solid";
+import { CheckCircle2, AlertCircle, FileText, BarChart3, ShieldCheck, Globe } from "lucide-solid";
 
 export default function ComplianceDashboard() {
     const standards = [

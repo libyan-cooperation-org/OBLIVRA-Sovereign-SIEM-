@@ -64,4 +64,4 @@ const filteredCases = createMemo(() => {
 
 const getCase = (id: string) => cases().find(c => c.id === id);
 
-export const casesStore = { cases, filteredCases, selectedCase, setSelectedCase, statusFilter, setStatusFilter, getCase };
+export const casesStore = { cases, setCases, filteredCases, selectedCase, setSelectedCase, statusFilter, setStatusFilter, getCase };

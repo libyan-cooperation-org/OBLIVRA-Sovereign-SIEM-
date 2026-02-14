@@ -4,7 +4,7 @@ import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
 import { alertStore, addToast } from "../../stores/registry";
 import type { Alert, AlertSeverity } from "../../stores/registry";
-import { AlertTriangle, Plus, Filter, RefreshCw, Eye, CheckCircle, XCircle } from "lucide-solid";
+import { Plus, Filter, RefreshCw, Eye, CheckCircle, XCircle } from "lucide-solid";
 import { Modal } from "../../design-system/components/Modal";
 import { Tabs } from "../../design-system/components/Tabs";
 

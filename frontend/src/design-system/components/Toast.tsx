@@ -1,4 +1,4 @@
-import { For, Show } from "solid-js";
+import { For } from "solid-js";
 import { toastStore } from "../../stores/registry";
 import { CheckCircle, AlertTriangle, XCircle, Info, X } from "lucide-solid";
 

@@ -33,4 +33,4 @@ const totalEPS = () => agents().reduce((sum, a) => sum + a.eps, 0);
 const onlineCount = () => agents().filter(a => a.status === "online").length;
 const offlineCount = () => agents().filter(a => a.status === "offline").length;
 
-export const agentsStore = { agents, selectedAgent, setSelectedAgent, totalEPS, onlineCount, offlineCount };
+export const agentsStore = { agents, setAgents, selectedAgent, setSelectedAgent, totalEPS, onlineCount, offlineCount };

@@ -152,7 +152,8 @@ const [evidence, setEvidence] = createSignal<Evidence[]>([
   { id: "EV-9921", name: "memdump_svc_host_312.raw", type: "Memory Dump", collectedAt: "2024-02-14 10:22", size: "2.4 GB", hash: "SHA256: e3b0c442..." },
   { id: "EV-8842", name: "disk_img_ws_finance_12.vhdx", type: "Disk Image", collectedAt: "2024-02-13 15:44", size: "8.1 GB", hash: "SHA256: a4f8...d921" },
 ]);
-export const forensicsStore = { evidence, setEvidence };
+const [merkleRoot, setMerkleRoot] = createSignal("0x7f8821aa9901bc22d109f7a8b6c5d4e3d82d5d6d");
+export const forensicsStore = { evidence, setEvidence, merkleRoot, setMerkleRoot };
 
 // ─── Netflow Store ─────────────────────────────────────────────
 export interface Flow {

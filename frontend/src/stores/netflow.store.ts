@@ -49,4 +49,4 @@ const bandwidthHistory = Array.from({ length: 30 }, (_, i) => ({
   outbound: Math.floor(Math.random() * 200 + 50),
 }));
 
-export const netflowStore = { flows, selectedFlow, setSelectedFlow, topTalkers, bandwidthHistory };
+export const netflowStore = { flows, setFlows, selectedFlow, setSelectedFlow, topTalkers, bandwidthHistory };

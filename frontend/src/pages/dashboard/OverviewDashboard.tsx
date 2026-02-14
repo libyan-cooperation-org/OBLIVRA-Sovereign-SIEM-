@@ -1,27 +1,16 @@
-import { For, createSignal } from "solid-js";
+import { For } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { PulseIndicator } from "../../effects/index";
 import { dashboardStore, alertStore, agentStore } from "../../stores/registry";
 import {
-  Activity, AlertTriangle, Shield, Server, TrendingUp,
-  Eye, Cpu, HardDrive, Zap, Globe, Target
+  Activity, AlertTriangle, Server, Zap, Globe, Target
 } from "lucide-solid";
 
 const severityColor = (s: string) => ({
   critical: "error", high: "warning", medium: "warning", low: "success", info: "info"
 } as any)[s] ?? "muted";
 
-const MiniSparkline = (props: { data: number[] }) => {
-  const max = Math.max(...props.data);
-  const w = 120, h = 36;
-  const pts = props.data.map((v, i) => `${(i / (props.data.length - 1)) * w},${h - (v / max) * h}`).join(" ");
-  return (
-    <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} class="overflow-visible">
-      <polyline points={pts} fill="none" stroke="#6366f1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-    </svg>
-  );
-};
 
 const RiskGauge = (props: { score: number }) => {
   const r = 52, cx = 64, cy = 64;
@@ -133,7 +122,7 @@ export default function OverviewDashboard() {
           </div>
           <div class="relative h-32 flex items-end">
             <For each={epsHistory()}>
-              {(v, i) => {
+              {(v) => {
                 const max = Math.max(...epsHistory());
                 const pct = (v / max) * 100;
                 return (

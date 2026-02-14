@@ -1,6 +1,6 @@
 import { For, createEffect, onCleanup } from "solid-js";
 import { Card } from "../../design-system/components/Card";
-import { Badge } from "../../design-system/components/Badge";
+
 import { Button } from "../../design-system/components/Button";
 import { Radio, ScrollText, StopCircle, Play, Filter, Trash2 } from "lucide-solid";
 import { liveTailStore } from "../../stores/registry";

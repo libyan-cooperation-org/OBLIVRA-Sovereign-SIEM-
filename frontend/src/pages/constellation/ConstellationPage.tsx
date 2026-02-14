@@ -1,5 +1,4 @@
 import { onMount, onCleanup } from "solid-js";
-import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Globe, Maximize2, Share2, Layers, Cpu, Zap, Shield } from "lucide-solid";
 import * as THREE from "three";

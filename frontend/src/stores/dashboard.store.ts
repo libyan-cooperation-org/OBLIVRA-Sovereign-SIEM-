@@ -69,4 +69,4 @@ setInterval(() => {
   setEpsHistory(prev => [...prev.slice(1), Math.floor(Math.random() * 8000 + 2000)]);
 }, 2000);
 
-export const dashboardStore = { epsHistory, riskScore, threatFeed, geoEvents, mitreMatrix };
+export const dashboardStore = { epsHistory, setEpsHistory, riskScore, setRiskScore, threatFeed, geoEvents, mitreMatrix };

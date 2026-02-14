@@ -2,7 +2,7 @@ import { For, createSignal } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
-import { Target, Search, Bookmark, History, Play, Filter, Lightbulb } from "lucide-solid";
+import { Target, Search, Bookmark, History, Play, Filter, Lightbulb, Activity } from "lucide-solid";
 import { huntingStore } from "../../stores/registry";
 
 export default function HuntingWorkspace() {
