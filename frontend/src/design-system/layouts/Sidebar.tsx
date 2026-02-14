@@ -1,61 +1,98 @@
 import { For } from "solid-js";
+import { A, useLocation } from "@solidjs/router";
 import {
-    BarChart3,
+    LayoutDashboard,
     Search,
     AlertTriangle,
     Shield,
     FileText,
     Activity,
-    Settings,
     Database,
-    Users
+    Settings,
+    Radio,
+    Zap,
+    Globe,
+    Terminal,
+    Fingerprint,
+    Boxes,
+    Cpu,
+    Target
 } from "lucide-solid";
 
+const navItems = [
+    { label: "Dashboard", icon: LayoutDashboard, path: "/" },
+    { label: "Explorer", icon: Search, path: "/explorer" },
+    { label: "Live Tail", icon: Radio, path: "/livetail" },
+    { label: "Alerts", icon: AlertTriangle, path: "/alerts" },
+    { label: "Threat Hunting", icon: Target, path: "/hunting" },
+    { label: "Forensics", icon: Shield, path: "/forensics" },
+    { label: "Cases", icon: FileText, path: "/cases" },
+    { label: "Netflow", icon: Activity, path: "/netflow" },
+    { label: "FIM", icon: Fingerprint, path: "/fim" },
+    { label: "Compliance", icon: Zap, path: "/compliance" },
+    { label: "Assets", icon: Database, path: "/assets" },
+    { label: "Deception", icon: Boxes, path: "/deception" },
+    { label: "Constellation", icon: Globe, path: "/constellation" },
+    { label: "Threat Intel", icon: Zap, path: "/threat-intel" },
+    { label: "API Lab", icon: Terminal, path: "/api-lab" },
+    { label: "Simulation", icon: Cpu, path: "/simulation" },
+];
+
 export const Sidebar = () => {
-    const navItems = [
-        { label: "Dashboard", icon: BarChart3, path: "/dashboard" },
-        { label: "Explorer", icon: Search, path: "/explorer" },
-        { label: "Alerts", icon: AlertTriangle, path: "/alerts" },
-        { label: "Forensics", icon: Shield, path: "/forensics" },
-        { label: "Cases", icon: FileText, path: "/cases" },
-        { label: "Netflow", icon: Activity, path: "/netflow" },
-        { label: "Storage", icon: Database, path: "/storage" },
-        { label: "Users", icon: Users, path: "/users" },
-    ];
+    const location = useLocation();
 
     return (
-        <aside class="w-64 border-r border-white/5 bg-surface flex flex-col h-screen sticky top-0">
+        <aside class="w-64 border-r border-white/5 bg-surface flex flex-col h-screen sticky top-0 z-50">
             <div class="p-6">
                 <div class="flex items-center gap-3">
-                    <div class="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
+                    <div class="w-8 h-8 bg-accent rounded-lg flex items-center justify-center shadow-lg shadow-accent/20">
                         <Shield class="text-white" size={20} />
                     </div>
-                    <h1 class="font-bold text-xl tracking-tight text-white">OBLIVRA</h1>
+                    <div>
+                        <h1 class="font-bold text-xl tracking-tight text-white leading-none">OBLIVRA</h1>
+                        <span class="text-[10px] text-muted font-mono tracking-widest uppercase">Sovereign SIEM</span>
+                    </div>
                 </div>
             </div>
 
-            <nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto">
+            <nav class="flex-1 px-4 py-2 space-y-1 overflow-y-auto custom-scrollbar">
                 <For each={navItems}>
-                    {(item) => (
-                        <a
-                            href="#"
-                            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-secondary hover:text-white hover:bg-white/5 transition-all group"
-                        >
-                            <item.icon size={18} class="group-hover:text-accent transition-colors" />
-                            <span>{item.label}</span>
-                        </a>
-                    )}
+                    {(item) => {
+                        const active = () => location.pathname === item.path;
+                        return (
+                            <A
+                                href={item.path}
+                                class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all group relative"
+                                activeClass="bg-accent/10 text-accent font-medium"
+                                inactiveClass="text-secondary hover:text-white hover:bg-white/5"
+                            >
+                                <item.icon size={18} class={active() ? "text-accent" : "group-hover:text-accent transition-colors"} />
+                                <span>{item.label}</span>
+                                {active() && <div class="absolute left-0 w-1 h-5 bg-accent rounded-r-full" />}
+                            </A>
+                        );
+                    }}
                 </For>
             </nav>
 
-            <div class="p-4 mt-auto">
-                <a
-                    href="#"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-white bg-white/5 hover:bg-white/10 transition-all border border-white/5"
+            <div class="p-4 mt-auto border-t border-white/5">
+                <A
+                    href="/settings"
+                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-secondary hover:text-white hover:bg-white/5 transition-all"
+                    activeClass="bg-white/10 text-white"
                 >
                     <Settings size={18} />
                     <span>Settings</span>
-                </a>
+                </A>
+                <div class="mt-4 flex items-center gap-3 px-3 py-2">
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-indigo-600 flex items-center justify-center text-xs font-bold ring-2 ring-white/10">
+                        KA
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-white truncate">KingKnull</p>
+                        <p class="text-[10px] text-muted truncate">Administrator</p>
+                    </div>
+                </div>
             </div>
         </aside>
     );
