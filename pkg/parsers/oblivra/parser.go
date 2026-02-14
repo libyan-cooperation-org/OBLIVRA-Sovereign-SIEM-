@@ -5,8 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mr-Naps/oblivra/pkg/models"
-	"github.com/Mr-Naps/oblivra/pkg/parsers"
+	"github.com/libyan-cooperation-org/OBLIVRA-Sovereign-SIEM-/pkg/models"
+	"github.com/libyan-cooperation-org/OBLIVRA-Sovereign-SIEM-/pkg/parsers"
 )
 
 type OblivraAgentParser struct{}

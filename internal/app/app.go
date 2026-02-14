@@ -3,7 +3,7 @@ package app
 import (
 	"context"
 
-	"github.com/Mr-Naps/oblivra/internal/config"
+	"github.com/libyan-cooperation-org/OBLIVRA-Sovereign-SIEM-/internal/config"
 )
 
 // App struct

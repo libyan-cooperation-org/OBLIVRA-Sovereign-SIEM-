@@ -1,4 +1,4 @@
-module github.com/Mr-Naps/oblivra
+module github.com/libyan-cooperation-org/OBLIVRA-Sovereign-SIEM-
 
 go 1.25.6
 

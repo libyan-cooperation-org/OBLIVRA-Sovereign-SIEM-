@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Mr-Naps/oblivra/pkg/models"
-	"github.com/Mr-Naps/oblivra/pkg/parsers"
+	"github.com/libyan-cooperation-org/OBLIVRA-Sovereign-SIEM-/pkg/models"
+	"github.com/libyan-cooperation-org/OBLIVRA-Sovereign-SIEM-/pkg/parsers"
 )
 
 // WinEventXML represents the standard Windows Event XML structure

@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/Mr-Naps/oblivra/pkg/models"
+	"github.com/libyan-cooperation-org/OBLIVRA-Sovereign-SIEM-/pkg/models"
 )
 
 // Parser is the interface that all log parsers must implement

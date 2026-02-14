@@ -105,4 +105,4 @@ Apache License 2.0 — see LICENSE.
 👤 Author
 
 Sanad Ali AbuKhshaim
-Libyan Cooperation Organization (LCO)
+libyan-cooperation-org
