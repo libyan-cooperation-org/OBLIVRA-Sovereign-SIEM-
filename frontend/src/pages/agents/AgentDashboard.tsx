@@ -1,14 +1,16 @@
-import { For, createSignal } from "solid-js";
+import { For, createSignal, onMount } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
 import { PulseIndicator } from "../../effects/index";
-import { Server, Shield, Activity, Download, Plus, Search, Terminal, Settings2 } from "lucide-solid";
-import { agentStore } from "../../stores/registry";
+import { Server, Shield, TrendingUp, Download, Plus, Search, Terminal, Settings2 } from "lucide-solid";
+import { agentsStore } from "../../stores/agents.store";
 
 export default function AgentDashboard() {
-  const { agents } = agentStore;
+  const { agents, load } = agentsStore;
   const [search, setSearch] = createSignal("");
+
+  onMount(() => load());
 
   const filteredAgents = () => agents().filter(a =>
     a.hostname.toLowerCase().includes(search().toLowerCase()) ||
@@ -41,7 +43,7 @@ export default function AgentDashboard() {
           </div>
         </Card>
         <Card class="flex items-center gap-4">
-          <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400"><Activity size={22} /></div>
+          <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400"><TrendingUp size={22} /></div>
           <div>
             <p class="text-xs text-muted font-medium uppercase tracking-wider">Total Throughput</p>
             <p class="text-2xl font-bold font-mono text-white">4.2 GB/day</p>
@@ -94,14 +96,14 @@ export default function AgentDashboard() {
                   <tr class="hover:bg-white/5 transition-colors group">
                     <td class="px-6 py-4">
                       <div class="flex items-center gap-2">
-                        <PulseIndicator active={agent.status === 'online'} color={agent.status === 'online' ? '#22c55e' : agent.status === 'throttled' ? '#f97316' : '#64748b'} />
+                        <PulseIndicator active={agent.status === 'online'} />
                         <span class="capitalize text-xs font-medium">{agent.status}</span>
                       </div>
                     </td>
                     <td class="px-6 py-4">
                       <div class="flex flex-col">
                         <span class="font-bold text-white font-mono">{agent.hostname}</span>
-                        <span class="text-[10px] text-muted">v{agent.version} • {agent.id}</span>
+                        <span class="text-[10px] text-muted">v{agent.version} • {agent.protocol}</span>
                       </div>
                     </td>
                     <td class="px-6 py-4 font-mono text-secondary">{agent.ip}</td>

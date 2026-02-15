@@ -1,12 +1,14 @@
-import { For, createSignal } from "solid-js";
+import { For, createSignal, onMount } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
-import { Database, Server, Laptop, Router, Cpu, Search, Plus, Download, Filter, Tag } from "lucide-solid";
-import { assetStore } from "../../stores/registry";
+import { Database, Server, Laptop, Router, Cpu, Search, Plus, Download, Filter, Tag, Globe, Users } from "lucide-solid";
+import { assetStore } from "../../stores/assets.store";
 
 export default function AssetInventory() {
-    const { assets } = assetStore;
+    const { assets, load } = assetStore;
     const [search, setSearch] = createSignal("");
+
+    onMount(() => load());
 
     const filteredAssets = () => assets().filter(a =>
         a.hostname.toLowerCase().includes(search().toLowerCase()) ||
@@ -17,13 +19,11 @@ export default function AssetInventory() {
         switch (type) {
             case 'server': return Server;
             case 'workstation': return Laptop;
-            case 'firewall': return Shield;
+            case 'firewall': return Database;
             case 'router': return Router;
             default: return Cpu;
         }
     };
-
-    const Shield = (props: any) => <Database {...props} />; // Fallback icon
 
     return (
         <div class="space-y-6 animate-in fade-in duration-500">
@@ -120,7 +120,7 @@ export default function AssetInventory() {
                                             </td>
                                             <td class="px-6 py-4 text-muted">{asset.owner}</td>
                                             <td class="px-6 py-4 text-right font-mono text-[11px] text-muted">
-                                                {new Date(asset.lastSeen).toLocaleDateString()}
+                                                {asset.lastSeen instanceof Date ? asset.lastSeen.toLocaleDateString() : new Date(asset.lastSeen as any).toLocaleDateString()}
                                             </td>
                                         </tr>
                                     );
@@ -134,5 +134,4 @@ export default function AssetInventory() {
     );
 }
 
-const Globe = (props: any) => <Database {...props} />; // Icons not available in thought local
-const Users = (props: any) => <Database {...props} />; // Icons not available in thought local
+

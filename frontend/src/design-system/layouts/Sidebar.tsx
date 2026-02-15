@@ -6,7 +6,7 @@ import {
     AlertTriangle,
     Shield,
     FileText,
-    Activity,
+    TrendingUp,
     Database,
     Settings,
     Radio,
@@ -16,26 +16,29 @@ import {
     Fingerprint,
     Boxes,
     Cpu,
-    Target
+    Target,
+    Server
 } from "lucide-solid";
 
 const navItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/" },
-    { label: "Explorer", icon: Search, path: "/explorer" },
+    { label: "Search", icon: Search, path: "/search" },
+    { label: "Explorer", icon: Database, path: "/explorer" },
     { label: "Live Tail", icon: Radio, path: "/livetail" },
     { label: "Alerts", icon: AlertTriangle, path: "/alerts" },
-    { label: "Threat Hunting", icon: Target, path: "/hunting" },
-    { label: "Forensics", icon: Shield, path: "/forensics" },
     { label: "Cases", icon: FileText, path: "/cases" },
-    { label: "Netflow", icon: Activity, path: "/netflow" },
+    { label: "Threat Hunting", icon: Target, path: "/hunting" },
+    { label: "Forensics", icon: Shield, path: "/forensics/merkle" },
+    { label: "Agents", icon: Server, path: "/agents" },
+    { label: "Netflow", icon: TrendingUp, path: "/netflow" },
     { label: "FIM", icon: Fingerprint, path: "/fim" },
     { label: "Compliance", icon: Zap, path: "/compliance" },
     { label: "Assets", icon: Database, path: "/assets" },
     { label: "Deception", icon: Boxes, path: "/deception" },
     { label: "Constellation", icon: Globe, path: "/constellation" },
     { label: "Threat Intel", icon: Zap, path: "/threat-intel" },
-    { label: "API Lab", icon: Terminal, path: "/api-lab" },
     { label: "Simulation", icon: Cpu, path: "/simulation" },
+    { label: "API Lab", icon: Terminal, path: "/api-lab" },
 ];
 
 export const Sidebar = () => {
@@ -77,7 +80,7 @@ export const Sidebar = () => {
 
             <div class="p-4 mt-auto border-t border-white/5">
                 <A
-                    href="/settings"
+                    href="/settings/appearance"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-secondary hover:text-white hover:bg-white/5 transition-all"
                     activeClass="bg-white/10 text-white"
                 >

@@ -1,36 +1,61 @@
-import { createSignal } from "solid-js";
+import { createSignal, createMemo } from "solid-js";
+import { api, type BackendAgent } from "../services/api";
 
 export type AgentStatus = "online" | "offline" | "throttled" | "updating";
 
 export interface Agent {
   id: string;
-  name: string;
-  host: string;
+  hostname: string;
   ip: string;
-  os: "windows" | "linux" | "macos";
-  status: AgentStatus;
+  os: string;
   version: string;
+  status: AgentStatus;
   eps: number;
-  queueDepth: number;
+  protocol: string;
   lastSeen: Date;
-  protocol: "grpc" | "syslog" | "hec";
-  tags: string[];
 }
 
-const mockAgents: Agent[] = [
-  { id: "ag1", name: "DC-01-Collector", host: "dc-01.corp.local", ip: "10.0.0.10", os: "windows", status: "online", version: "2.4.1", eps: 847, queueDepth: 12, lastSeen: new Date(), protocol: "grpc", tags: ["domain-controller", "critical"] },
-  { id: "ag2", name: "Web-Nginx-01", host: "web-01.corp.local", ip: "10.0.1.5", os: "linux", status: "online", version: "2.4.1", eps: 1203, queueDepth: 0, lastSeen: new Date(), protocol: "grpc", tags: ["web", "dmz"] },
-  { id: "ag3", name: "DB-Postgres-02", host: "db-02.corp.local", ip: "10.0.2.12", os: "linux", status: "throttled", version: "2.3.8", eps: 342, queueDepth: 89, lastSeen: new Date(Date.now() - 30000), protocol: "grpc", tags: ["database", "sensitive"] },
-  { id: "ag4", name: "FW-Edge-Collector", host: "fw-edge.corp.local", ip: "10.0.0.1", os: "linux", status: "online", version: "2.4.1", eps: 5621, queueDepth: 3, lastSeen: new Date(), protocol: "syslog", tags: ["firewall", "critical"] },
-  { id: "ag5", name: "WS-Sales-Batch", host: "ws-sales-01.corp.local", ip: "192.168.10.42", os: "windows", status: "offline", version: "2.2.0", eps: 0, queueDepth: 0, lastSeen: new Date(Date.now() - 900000), protocol: "grpc", tags: ["workstation"] },
-  { id: "ag6", name: "Mail-Exchange-01", host: "mail.corp.local", ip: "10.0.3.7", os: "windows", status: "updating", version: "2.4.0", eps: 0, queueDepth: 245, lastSeen: new Date(Date.now() - 60000), protocol: "grpc", tags: ["mail", "critical"] },
-];
+function fromBackend(a: BackendAgent): Agent {
+  return {
+    id: a.ID,
+    hostname: a.Hostname,
+    ip: a.IP,
+    os: a.OS,
+    version: a.Version,
+    status: (a.Status as AgentStatus) ?? "offline",
+    eps: a.EPS ?? 0,
+    protocol: a.Protocol ?? "grpc",
+    lastSeen: new Date(a.LastSeen),
+  };
+}
 
-const [agents, setAgents] = createSignal<Agent[]>(mockAgents);
+// ─── State ────────────────────────────────────────────────────────────────────
+const [agents, setAgents] = createSignal<Agent[]>([]);
+const [loading, setLoading] = createSignal(false);
 const [selectedAgent, setSelectedAgent] = createSignal<string | null>(null);
 
-const totalEPS = () => agents().reduce((sum, a) => sum + a.eps, 0);
-const onlineCount = () => agents().filter(a => a.status === "online").length;
-const offlineCount = () => agents().filter(a => a.status === "offline").length;
+// ─── Derived ──────────────────────────────────────────────────────────────────
+const totalEPS = createMemo(() => agents().reduce((s, a) => s + a.eps, 0));
+const onlineCount = createMemo(() => agents().filter(a => a.status === "online").length);
+const offlineCount = createMemo(() => agents().filter(a => a.status === "offline").length);
 
-export const agentsStore = { agents, setAgents, selectedAgent, setSelectedAgent, totalEPS, onlineCount, offlineCount };
+// ─── Actions ──────────────────────────────────────────────────────────────────
+const load = async () => {
+  setLoading(true);
+  try {
+    const raw = await api.listAgents();
+    setAgents(raw.map(fromBackend));
+  } finally {
+    setLoading(false);
+  }
+};
+
+export const agentsStore = {
+  agents,
+  loading,
+  selectedAgent, setSelectedAgent,
+  totalEPS,
+  onlineCount,
+  offlineCount,
+  load,
+};

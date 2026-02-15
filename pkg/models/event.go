@@ -32,13 +32,24 @@ type Event struct {
 
 // Alert represents a triggered detection rule
 type Alert struct {
+	ID        string            `json:"id"`
+	EventID   string            `json:"event_id"`
+	RuleID    string            `json:"rule_id"`
+	Timestamp time.Time         `json:"timestamp"`
+	Severity  Severity          `json:"severity"`
+	Title     string            `json:"title"`
+	Summary   string            `json:"summary"`
+	Status    string            `json:"status"` // Open, Investigating, Resolved, False Positive
+	Assignee  string            `json:"assignee"`
+	Host      string            `json:"host"`
+	Metadata  map[string]string `json:"metadata"`
+}
+
+// SavedSearch represents a persisted hunting query.
+type SavedSearch struct {
 	ID        string    `json:"id"`
-	EventID   string    `json:"event_id"`
-	RuleID    string    `json:"rule_id"`
-	Timestamp time.Time `json:"timestamp"`
-	Severity  Severity  `json:"severity"`
-	Title     string    `json:"title"`
-	Summary   string    `json:"summary"`
-	Status    string    `json:"status"` // Open, Investigating, Resolved, False Positive
-	Assignee  string    `json:"assignee"`
+	Name      string    `json:"name"`
+	Query     string    `json:"query"`
+	CreatedBy string    `json:"created_by"`
+	CreatedAt time.Time `json:"created_at"`
 }

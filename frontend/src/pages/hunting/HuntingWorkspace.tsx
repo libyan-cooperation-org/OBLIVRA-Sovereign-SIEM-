@@ -1,13 +1,15 @@
-import { For, createSignal } from "solid-js";
+import { For, createSignal, onMount } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
-import { Target, Search, Bookmark, History, Play, Filter, Lightbulb, Activity } from "lucide-solid";
-import { huntingStore } from "../../stores/registry";
+import { Target, Search, Bookmark, History, Play, Filter, Lightbulb, TrendingUp } from "lucide-solid";
+import { huntingStore } from "../../stores/hunting.store";
 
 export default function HuntingWorkspace() {
-    const { hypotheses } = huntingStore;
+    const { queries, load } = huntingStore;
     const [activeTab, setActiveTab] = createSignal<"hypotheses" | "queries" | "history">("hypotheses");
+
+    onMount(() => load());
 
     return (
         <div class="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -76,7 +78,7 @@ export default function HuntingWorkspace() {
                                 <p class="text-[10px] text-muted">Join multiple data sources based on shared attributes</p>
                             </div>
                             <div class="p-3 rounded-lg bg-white/5 border border-white/5 hover:border-emerald-500/20 transition-all cursor-pointer group">
-                                <Activity size={16} class="text-emerald-400 mb-2" />
+                                <TrendingUp size={16} class="text-emerald-400 mb-2" />
                                 <h4 class="text-sm font-medium">Anomaly Detection</h4>
                                 <p class="text-[10px] text-muted">Identify deviations from historical baselines</p>
                             </div>
@@ -85,20 +87,19 @@ export default function HuntingWorkspace() {
 
                     <h3 class="font-semibold flex items-center gap-2"><Lightbulb size={18} class="text-amber-400" /> Active Hypotheses</h3>
                     <div class="space-y-3">
-                        <For each={hypotheses()}>
-                            {(h) => (
+                        <For each={queries()} fallback={
+                            <div class="text-center py-8 text-muted text-sm">No saved hunts yet. Run a search and save it.</div>
+                        }>
+                            {(q) => (
                                 <Card class="group hover:bg-white/[0.07] transition-all border-l-4 border-l-transparent hover:border-l-accent cursor-pointer">
                                     <div class="flex items-center justify-between mb-2">
-                                        <Badge variant={h.status === 'proven' ? 'success' : h.status === 'disproven' ? 'error' : 'info'}>
-                                            {h.status}
-                                        </Badge>
-                                        <span class="text-[10px] text-muted font-mono">{new Date(h.created).toLocaleDateString()}</span>
+                                        <Badge variant="info">saved</Badge>
+                                        <span class="text-[10px] text-muted font-mono">{q.createdAt.toLocaleDateString()}</span>
                                     </div>
-                                    <h4 class="font-medium text-white mb-1">{h.title}</h4>
-                                    <p class="text-xs text-muted mb-3">Query: <code class="bg-black/20 px-1 py-0.5 rounded text-accent">{h.query}</code></p>
+                                    <h4 class="font-medium text-white mb-1">{q.name}</h4>
+                                    <p class="text-xs text-muted mb-3">Query: <code class="bg-black/20 px-1 py-0.5 rounded text-accent">{q.query}</code></p>
                                     <div class="flex items-center gap-4 text-[10px] text-muted">
-                                        <span class="flex items-center gap-1"><History size={12} /> Last run: 2h ago</span>
-                                        <span class="flex items-center gap-1"><Filter size={12} /> 12 source hosts</span>
+                                        <span class="flex items-center gap-1"><History size={12} /> Saved by: {q.createdBy}</span>
                                     </div>
                                 </Card>
                             )}

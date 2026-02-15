@@ -1,49 +1,23 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, For, Show, onMount } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
 import { Search, Clock, Download, Bookmark, ChevronDown, ChevronRight } from "lucide-solid";
-import type { LogEvent } from "../../stores/registry";
+import { searchStore } from "../../stores/search.store";
 
 const LEVELS: Record<string, "error" | "warning" | "info" | "muted" | "success"> = {
   CRITICAL: "error", ERROR: "error", WARN: "warning", INFO: "info", DEBUG: "muted"
 };
 
-const sampleLogs: LogEvent[] = Array.from({ length: 40 }, (_, i) => ({
-  id: `log${i}`,
-  timestamp: new Date(Date.now() - i * 45000).toISOString(),
-  source: ["fw-perimeter", "srv-dc-01", "ws-finance-12", "srv-web-02"][i % 4],
-  level: (["INFO", "WARN", "ERROR", "CRITICAL", "DEBUG"] as const)[i % 5],
-  host: ["10.0.0.1", "10.0.0.10", "192.168.10.42", "10.0.0.11"][i % 4],
-  message: [
-    "Authentication failed for user admin from 185.220.101.34",
-    "Firewall rule BLOCKED inbound traffic on port 22",
-    "Process powershell.exe spawned by winword.exe (PID 4821)",
-    "DNS query for c2.malicious-domain.ru detected",
-    "System health check completed successfully",
-    "Failed login attempt: user=root ip=91.108.56.184",
-    "Connection established to 10.0.0.20 on port 1433",
-  ][i % 7],
-  fields: { event_id: `4${624 + (i % 10)}`, logon_type: "3", dest_port: `${[22, 443, 80, 3389][i % 4]}` },
-}));
-
 export default function SearchPage() {
-  const [query, setQuery] = createSignal("");
-  const [timeRange, setTimeRange] = createSignal("1h");
-  const [results, setResults] = createSignal<LogEvent[]>([]);
+  const { query, setQuery, results, loading, timeRange, setTimeRange, executeSearch } = searchStore;
   const [expanded, setExpanded] = createSignal<string | null>(null);
-  const [loading, setLoading] = createSignal(false);
 
   const timeRanges = ["15m", "1h", "6h", "24h", "7d", "30d"];
 
-  const runSearch = () => {
-    setLoading(true);
-    setTimeout(() => {
-      const q = query().toLowerCase();
-      setResults(q ? sampleLogs.filter(l => l.message.toLowerCase().includes(q) || l.source.toLowerCase().includes(q) || l.level.toLowerCase().includes(q)) : sampleLogs);
-      setLoading(false);
-    }, 400);
-  };
+  onMount(() => executeSearch(""));
+
+  const runSearch = () => executeSearch(query());
 
   const histogramData = () => {
     const counts = Array.from({ length: 24 }, (_, i) => ({ hour: i, count: Math.floor(Math.random() * 800 + 100) }));

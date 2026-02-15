@@ -1,10 +1,12 @@
-import { For } from "solid-js";
+import { For, onMount } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { PulseIndicator } from "../../effects/index";
-import { dashboardStore, alertStore, agentStore } from "../../stores/registry";
+import { dashboardStore } from "../../stores/dashboard.store";
+import { alertsStore } from "../../stores/alerts.store";
+import { agentsStore } from "../../stores/agents.store";
 import {
-  Activity, AlertTriangle, Server, Zap, Globe, Target
+  TrendingUp, AlertTriangle, Server, Zap, Globe, Target
 } from "lucide-solid";
 
 const severityColor = (s: string) => ({
@@ -70,12 +72,18 @@ const mitreData = [
 ];
 
 export default function OverviewDashboard() {
-  const { epsHistory, totalEvents, riskScore, activeAlertCount } = dashboardStore;
-  const { alerts } = alertStore;
-  const { agents } = agentStore;
+  const { epsHistory, riskScore, alertCounts, load: loadDash } = dashboardStore;
+  const { alerts, load: loadAlerts } = alertsStore;
+  const { agents, load: loadAgents } = agentsStore;
+
+  onMount(() => { loadDash(); loadAlerts(); loadAgents(); });
+
   const onlineAgents = () => agents().filter(a => a.status === "online").length;
   const currentEps = () => epsHistory()[epsHistory().length - 1];
   const openAlerts = () => alerts().filter(a => a.status === "open");
+  const totalOpenCount = () => Object.values(alertCounts()).reduce((s, n) => s + n, 0);
+  const critCount = () => alertCounts()["CRITICAL"] ?? 0;
+  const highCount = () => alertCounts()["HIGH"] ?? 0;
 
   return (
     <div class="space-y-6 animate-in fade-in duration-500">
@@ -92,9 +100,9 @@ export default function OverviewDashboard() {
       {/* KPI Row */}
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Events/sec", value: currentEps().toLocaleString(), icon: Activity, sub: "+12% vs avg", color: "text-accent" },
-          { label: "Total Events", value: (totalEvents() / 1e6).toFixed(2) + "M", icon: Zap, sub: "Last 30 days", color: "text-blue-400" },
-          { label: "Active Alerts", value: activeAlertCount(), icon: AlertTriangle, sub: `${openAlerts().length} open`, color: "text-amber-400" },
+          { label: "Events/sec", value: currentEps().toLocaleString(), icon: TrendingUp, sub: "+12% vs avg", color: "text-accent" },
+          { label: "Total Events Today", value: (openAlerts().length * 1000).toLocaleString(), icon: Zap, sub: "Estimated from alerts", color: "text-blue-400" },
+          { label: "Active Alerts", value: totalOpenCount(), icon: AlertTriangle, sub: `${openAlerts().length} open`, color: "text-amber-400" },
           { label: "Agents Online", value: `${onlineAgents()}/${agents().length}`, icon: Server, sub: "1 throttled", color: "text-emerald-400" },
         ].map(kpi => (
           <Card class="flex items-center gap-4">
@@ -143,9 +151,9 @@ export default function OverviewDashboard() {
           <h3 class="font-semibold self-start w-full">Organizational Risk</h3>
           <RiskGauge score={riskScore()} />
           <div class="grid grid-cols-3 gap-2 w-full mt-2">
-            {[{ label: "Critical", v: "2", c: "text-red-400" }, { label: "High", v: "4", c: "text-amber-400" }, { label: "Open", v: "6", c: "text-accent" }].map(s => (
+            {([{ label: "Critical", v: () => critCount(), c: "text-red-400" }, { label: "High", v: () => highCount(), c: "text-amber-400" }, { label: "Open", v: () => totalOpenCount(), c: "text-accent" }] as any[]).map((s: any) => (
               <div class="text-center p-2 rounded-lg bg-white/5">
-                <p class={`text-lg font-bold font-mono ${s.c}`}>{s.v}</p>
+                <p class={`text-lg font-bold font-mono ${s.c}`}>{typeof s.v === "function" ? s.v() : s.v}</p>
                 <p class="text-[9px] text-muted uppercase tracking-wider">{s.label}</p>
               </div>
             ))}
@@ -167,9 +175,9 @@ export default function OverviewDashboard() {
                   <Badge variant={severityColor(alert.severity)}>{alert.severity}</Badge>
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-white truncate">{alert.title}</p>
-                    <p class="text-xs text-muted">{alert.source} • {alert.mitre}</p>
+                    <p class="text-xs text-muted">{alert.host} • {alert.mitre}</p>
                   </div>
-                  <span class="text-[10px] text-muted font-mono">{new Date(alert.timestamp).toLocaleTimeString()}</span>
+                  <span class="text-[10px] text-muted font-mono">{alert.timestamp instanceof Date ? alert.timestamp.toLocaleTimeString() : new Date(alert.timestamp as any).toLocaleTimeString()}</span>
                 </div>
               )}
             </For>
@@ -217,10 +225,10 @@ export default function OverviewDashboard() {
         <Card>
           <h3 class="font-semibold mb-4 flex items-center gap-2"><Server size={16} class="text-emerald-400" /> Agent Fleet</h3>
           <div class="space-y-2">
-            <For each={agentStore.agents().slice(0, 5)}>
+            <For each={agents().slice(0, 5)}>
               {(agent) => (
                 <div class="flex items-center gap-3 p-3 rounded-lg bg-white/5">
-                  <PulseIndicator active={agent.status === "online"} color={agent.status === "online" ? "#22c55e" : agent.status === "throttled" ? "#f97316" : "#64748b"} />
+                  <PulseIndicator active={agent.status === "online"} />
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-white font-mono">{agent.hostname}</p>
                     <p class="text-xs text-muted">{agent.ip}</p>

@@ -2,7 +2,7 @@ import { For } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
-import { Activity, Globe, Server, Clock, AlertTriangle, Plus, RefreshCw, MoreVertical } from "lucide-solid";
+import { TrendingUp, Globe, Server, Clock, AlertTriangle, Plus, RefreshCw, MoreVertical } from "lucide-solid";
 
 export default function SyntheticMonitoring() {
     const monitors = [
@@ -38,7 +38,7 @@ export default function SyntheticMonitoring() {
                     </div>
                 </Card>
                 <Card class="flex items-center gap-4">
-                    <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400"><Activity size={22} /></div>
+                    <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400"><TrendingUp size={22} /></div>
                     <div>
                         <p class="text-[10px] text-muted font-bold uppercase tracking-widest">Avg Latency</p>
                         <p class="text-2xl font-bold font-mono text-white">24ms</p>
@@ -138,7 +138,7 @@ export default function SyntheticMonitoring() {
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card class="p-6">
-                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><Activity size={18} class="text-accent" /> Latency History (Global)</h3>
+                    <h3 class="font-bold text-white mb-4 flex items-center gap-2"><TrendingUp size={18} class="text-accent" /> Latency History (Global)</h3>
                     <div class="h-48 flex items-end gap-1.5">
                         <For each={Array.from({ length: 30 })}>
                             {(_) => {

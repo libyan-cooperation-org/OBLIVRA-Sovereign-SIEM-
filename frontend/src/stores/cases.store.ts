@@ -1,67 +1,70 @@
 import { createSignal, createMemo } from "solid-js";
+import { api, type BackendCase } from "../services/api";
 
-export type CaseStatus = "open" | "investigating" | "resolved" | "closed";
-export type CasePriority = "p1" | "p2" | "p3" | "p4";
-
-export interface CaseEvidence {
-  id: string;
-  type: "log" | "pcap" | "file" | "screenshot" | "note";
-  name: string;
-  hash: string;
-  timestamp: Date;
-  addedBy: string;
-}
+export type CaseStatus = "open" | "in_progress" | "resolved" | "closed" | "investigating";
 
 export interface CaseEntry {
   id: string;
   title: string;
   description: string;
   status: CaseStatus;
-  priority: CasePriority;
+  severity: string;
   assignee: string;
   createdAt: Date;
   updatedAt: Date;
-  alertIds: string[];
-  evidence: CaseEvidence[];
-  tags: string[];
-  tlp: "red" | "amber" | "green" | "white";
+  alertCount: number;
 }
 
-const mockCases: CaseEntry[] = [
-  {
-    id: "c1", title: "APT Campaign – C2 Infrastructure", description: "Coordinated C2 beaconing detected across 3 hosts. Suspected nation-state actor.", status: "investigating", priority: "p1",
-    assignee: "analyst01", createdAt: new Date(Date.now() - 86400000), updatedAt: new Date(Date.now() - 3600000), alertIds: ["a4", "a5"], tlp: "red",
-    evidence: [
-      { id: "e1", type: "pcap", name: "beacon_capture_2025.pcap", hash: "sha256:ab3f7e21...", timestamp: new Date(Date.now() - 7200000), addedBy: "analyst01" },
-      { id: "e2", type: "log", name: "netflow_export.json", hash: "sha256:9c1d4f88...", timestamp: new Date(Date.now() - 5400000), addedBy: "analyst01" },
-    ],
-    tags: ["apt", "c2", "beaconing"]
-  },
-  {
-    id: "c2", title: "Insider Threat – Privilege Abuse", description: "Dev account accessed production secrets outside normal hours.", status: "open", priority: "p2",
-    assignee: "analyst02", createdAt: new Date(Date.now() - 172800000), updatedAt: new Date(Date.now() - 14400000), alertIds: ["a2", "a3"], tlp: "amber",
-    evidence: [], tags: ["insider", "privilege"]
-  },
-  {
-    id: "c3", title: "Honeytoken Triggered – Credential Theft", description: "Fake svc_backup credentials used. Active intruder on LAN.", status: "investigating", priority: "p1",
-    assignee: "analyst01", createdAt: new Date(Date.now() - 3600000), updatedAt: new Date(Date.now() - 1800000), alertIds: ["a7"], tlp: "red",
-    evidence: [], tags: ["honeytoken", "credential-theft"]
-  },
-  {
-    id: "c4", title: "SSH Brute Force – External IP", description: "Sustained brute force from known Shodan-indexed IP.", status: "resolved", priority: "p3",
-    assignee: "analyst03", createdAt: new Date(Date.now() - 259200000), updatedAt: new Date(Date.now() - 86400000), alertIds: ["a1"], tlp: "green",
-    evidence: [], tags: ["brute-force", "external"]
-  },
-];
+function fromBackend(c: BackendCase): CaseEntry {
+  return {
+    id: c.ID,
+    title: c.Title,
+    description: c.Description,
+    status: (c.Status as CaseStatus) ?? "open",
+    severity: c.Severity ?? "medium",
+    assignee: c.Assignee ?? "",
+    createdAt: new Date(c.CreatedAt),
+    updatedAt: new Date(c.UpdatedAt),
+    alertCount: c.AlertCount ?? 0,
+  };
+}
 
-const [cases, setCases] = createSignal<CaseEntry[]>(mockCases);
+// ─── State ────────────────────────────────────────────────────────────────────
+const [cases, setCases] = createSignal<CaseEntry[]>([]);
+const [loading, setLoading] = createSignal(false);
 const [selectedCase, setSelectedCase] = createSignal<string | null>(null);
 const [statusFilter, setStatusFilter] = createSignal<CaseStatus | "all">("all");
 
-const filteredCases = createMemo(() => {
-  return cases().filter(c => statusFilter() === "all" || c.status === statusFilter());
-});
+// ─── Derived ──────────────────────────────────────────────────────────────────
+const filteredCases = createMemo(() =>
+  cases().filter(c => statusFilter() === "all" || c.status === statusFilter())
+);
 
 const getCase = (id: string) => cases().find(c => c.id === id);
 
-export const casesStore = { cases, setCases, filteredCases, selectedCase, setSelectedCase, statusFilter, setStatusFilter, getCase };
+// ─── Actions ──────────────────────────────────────────────────────────────────
+const load = async (status = "") => {
+  setLoading(true);
+  try {
+    const raw = await api.listCases(status, 200);
+    setCases(raw.map(fromBackend));
+  } finally {
+    setLoading(false);
+  }
+};
+
+const updateStatus = async (id: string, status: string) => {
+  await api.updateCaseStatus(id, status);
+  setCases(prev => prev.map(c => c.id === id ? { ...c, status: status as CaseStatus } : c));
+};
+
+export const casesStore = {
+  cases,
+  filteredCases,
+  loading,
+  selectedCase, setSelectedCase,
+  statusFilter, setStatusFilter,
+  getCase,
+  load,
+  updateStatus,
+};

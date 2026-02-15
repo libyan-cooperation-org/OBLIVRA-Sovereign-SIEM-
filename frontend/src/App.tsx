@@ -31,6 +31,8 @@ const IntegrationSettings = lazy(() => import("./pages/settings/tabs/Integration
 const TeamSettings = lazy(() => import("./pages/settings/tabs/TeamSettings"));
 const SystemSettings = lazy(() => import("./pages/settings/tabs/SystemSettings"));
 const OnboardingWizard = lazy(() => import("./pages/onboarding/OnboardingWizard"));
+const SearchPage = lazy(() => import("./pages/search/SearchPage"));
+const AgentDashboard = lazy(() => import("./pages/agents/AgentDashboard"));
 
 function App() {
   return (
@@ -59,6 +61,8 @@ function App() {
       <Route path="/monitoring" component={SyntheticMonitoring} />
       <Route path="/simulation" component={SimulationLab} />
       <Route path="/onboarding" component={OnboardingWizard} />
+      <Route path="/search" component={SearchPage} />
+      <Route path="/agents" component={AgentDashboard} />
       <Route path="/settings">
         <Route path="/appearance" component={AppearanceSettings} />
         <Route path="/security" component={SecuritySettings} />

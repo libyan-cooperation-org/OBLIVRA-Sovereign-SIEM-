@@ -1,13 +1,47 @@
 import { createSignal } from "solid-js";
-import type { Asset } from "../types";
+import { api, type BackendAsset } from "../services/api";
 
-const [assets, setAssets] = createSignal<Asset[]>([
-    { id: "as1", hostname: "srv-dc-01", ip: "10.0.0.10", type: "server", criticality: "crown_jewel", os: "Windows Server 2022", owner: "IT Infrastructure", lastSeen: new Date().toISOString() },
-    { id: "as2", hostname: "srv-db-03", ip: "10.0.0.20", type: "server", criticality: "crown_jewel", os: "RHEL 9", owner: "Database Team", lastSeen: new Date().toISOString() },
-]);
+export interface Asset {
+  id: string;
+  hostname: string;
+  ip: string;
+  os: string;
+  type: string;
+  criticality: string;
+  owner: string;
+  lastSeen: Date;
+  tags: string[];
+}
 
-export const assetStore = {
-    assets,
-    setAssets,
-    updateAsset: (updated: Asset) => setAssets(prev => prev.map(a => a.id === updated.id ? updated : a))
+function fromBackend(a: BackendAsset): Asset {
+  let tags: string[] = [];
+  try { tags = JSON.parse(a.Tags || "[]"); } catch { /* ignore */ }
+  return {
+    id: a.ID,
+    hostname: a.Hostname,
+    ip: a.IP,
+    os: a.OS,
+    type: a.Type,
+    criticality: a.Criticality,
+    owner: a.Owner,
+    lastSeen: new Date(a.LastSeen),
+    tags,
+  };
+}
+
+// ─── State ────────────────────────────────────────────────────────────────────
+const [assets, setAssets] = createSignal<Asset[]>([]);
+const [loading, setLoading] = createSignal(false);
+
+// ─── Actions ──────────────────────────────────────────────────────────────────
+const load = async () => {
+  setLoading(true);
+  try {
+    const raw = await api.listAssets(1000);
+    setAssets(raw.map(fromBackend));
+  } finally {
+    setLoading(false);
+  }
 };
+
+export const assetStore = { assets, loading, load };

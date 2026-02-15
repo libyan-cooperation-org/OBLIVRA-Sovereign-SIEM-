@@ -2,7 +2,7 @@ import { createSignal, For, onMount } from "solid-js";
 import { Card } from "../../design-system/components/Card";
 import { Badge } from "../../design-system/components/Badge";
 import { Button } from "../../design-system/components/Button";
-import { GitGraph, Search, Maximize2, RefreshCw, ZoomIn, ZoomOut, Save } from "lucide-solid";
+import { GitGraph, Search, Maximize2, RefreshCw, ZoomIn, ZoomOut, Save, AlertTriangle } from "lucide-solid";
 
 export default function GraphExplorer() {
     const [loading, setLoading] = createSignal(true);
@@ -146,4 +146,4 @@ export default function GraphExplorer() {
     );
 }
 
-import { AlertTriangle } from "lucide-solid";
+

@@ -88,7 +88,7 @@ export default function OnboardingWizard() {
                                     Next <ChevronRight size={18} class="ml-2" />
                                 </Button>
                             ) : (
-                                <Button onClick={() => window.location.href = "/dashboard"} class="min-w-[120px]">
+                                <Button onClick={() => window.location.href = "/"} class="min-w-[120px]">
                                     Finish <Check size={18} class="ml-2" />
                                 </Button>
                             )}

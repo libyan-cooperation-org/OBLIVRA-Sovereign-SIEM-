@@ -14,9 +14,10 @@ type Config struct {
 }
 
 type IngestionConfig struct {
-	SyslogPort int `yaml:"syslog_port" json:"syslog_port"`
-	HECPort    int `yaml:"hec_port" json:"hec_port"`
-	GRPCPort   int `yaml:"grpc_port" json:"grpc_port"`
+	SyslogPort int    `yaml:"syslog_port" json:"syslog_port"`
+	HECPort    int    `yaml:"hec_port" json:"hec_port"`
+	HECToken   string `yaml:"hec_token" json:"hec_token"`
+	GRPCPort   int    `yaml:"grpc_port" json:"grpc_port"`
 }
 
 type StorageConfig struct {
@@ -42,6 +43,7 @@ func DefaultConfig() *Config {
 		Ingestion: IngestionConfig{
 			SyslogPort: 514,
 			HECPort:    8088,
+			HECToken:   "oblivra-token-123",
 			GRPCPort:   50051,
 		},
 		Storage: StorageConfig{
