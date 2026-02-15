@@ -84,6 +84,20 @@ func (a *App) Startup(ctx context.Context) {
 	a.response.RegisterAction(&response.NotifyAction{})
 	a.response.RegisterAction(&response.IsolateHostAction{})
 	a.response.RegisterAction(&response.KillProcessAction{})
+	// Wire notification channels from config
+	response.SetNotificationConfig(response.NotificationConfig{
+		SMTPHost:     a.config.Notifications.SMTPHost,
+		SMTPPort:     a.config.Notifications.SMTPPort,
+		SMTPUser:     a.config.Notifications.SMTPUser,
+		SMTPPassword: a.config.Notifications.SMTPPassword,
+		SMTPFrom:     a.config.Notifications.SMTPFrom,
+		SMTPTo:       a.config.Notifications.SMTPTo,
+		SMTPTLS:      a.config.Notifications.SMTPTLS,
+		SlackWebhook: a.config.Notifications.SlackWebhook,
+		SlackChannel: a.config.Notifications.SlackChannel,
+		TeamsWebhook: a.config.Notifications.TeamsWebhook,
+		MinSeverity:  a.config.Notifications.MinSeverity,
+	})
 
 	// 3. Alerting
 	a.alerting = alerting.NewManager(a.storage.SQLite, a.response)
@@ -645,6 +659,67 @@ func (a *App) GetAlertGraph(alertID string) (*graph.Graph, error) {
 	}
 
 	return a.graph.GenerateFromEvents([]*models.Event{triggerEvent}), nil
+}
+
+// ─── NOTIFICATIONS SETTINGS ─────────────────────────────────────────────────
+
+// GetNotificationSettings returns the current notification channel config.
+func (a *App) GetNotificationSettings() *config.NotificationConfig {
+	return &a.config.Notifications
+}
+
+// UpdateNotificationSettings replaces the notification config and re-wires the SOAR engine.
+func (a *App) UpdateNotificationSettings(cfg config.NotificationConfig) error {
+	if err := a.checkPermission("admin:system"); err != nil {
+		return err
+	}
+	a.config.Notifications = cfg
+	response.SetNotificationConfig(response.NotificationConfig{
+		SMTPHost:     cfg.SMTPHost,
+		SMTPPort:     cfg.SMTPPort,
+		SMTPUser:     cfg.SMTPUser,
+		SMTPPassword: cfg.SMTPPassword,
+		SMTPFrom:     cfg.SMTPFrom,
+		SMTPTo:       cfg.SMTPTo,
+		SMTPTLS:      cfg.SMTPTLS,
+		SlackWebhook: cfg.SlackWebhook,
+		SlackChannel: cfg.SlackChannel,
+		TeamsWebhook: cfg.TeamsWebhook,
+		MinSeverity:  cfg.MinSeverity,
+	})
+	return nil
+}
+
+// ─── RULES MANAGEMENT ────────────────────────────────────────────────────────
+
+// ToggleRule enables or disables a detection rule by ID and hot-reloads the engine.
+func (a *App) ToggleRule(id string, enabled bool) error {
+	if err := a.checkPermission("rules:write"); err != nil {
+		return err
+	}
+	enabledInt := 0
+	if enabled {
+		enabledInt = 1
+	}
+	_, err := a.storage.SQLite.DB().Exec(
+		`UPDATE rules SET enabled=?, updated_at=? WHERE id=?`,
+		enabledInt, time.Now().Unix(), id,
+	)
+	if err != nil {
+		return err
+	}
+	// Hot-reload the detection engine without a restart
+	return a.detection.ReloadRules(a.storage.SQLite)
+}
+
+// ─── FORENSICS ────────────────────────────────────────────────────────────────
+
+// GetForensicsPublicKey returns the Ed25519 public key used to sign integrity blocks.
+func (a *App) GetForensicsPublicKey() string {
+	if a.forensics == nil {
+		return ""
+	}
+	return a.forensics.PublicKeyHex()
 }
 
 // monitoringProcessor is a simple wrapper to track EPS via the ingestion pipeline.

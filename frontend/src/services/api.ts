@@ -201,6 +201,21 @@ export const api = {
   listNetflowTopTalkers: (limit: number): Promise<BackendNetflowFlow[]> =>
     guard(() => (WailsApp as any).ListNetflowTopTalkers(limit) as Promise<BackendNetflowFlow[]>, []),
 
+  // ── Rules management ──────────────────────────────────────────────────────
+  toggleRule: (id: string, enabled: boolean): Promise<void> =>
+    guard(() => (WailsApp as any).ToggleRule(id, enabled), undefined as void),
+
+  // ── Notifications settings ────────────────────────────────────────────────
+  getNotificationSettings: (): Promise<any> =>
+    guard(() => (WailsApp as any).GetNotificationSettings(), null),
+
+  updateNotificationSettings: (cfg: any): Promise<void> =>
+    guard(() => (WailsApp as any).UpdateNotificationSettings(cfg), undefined as void),
+
+  // ── Forensics public key ──────────────────────────────────────────────────
+  getForensicsPublicKey: (): Promise<string> =>
+    guard(() => (WailsApp as any).GetForensicsPublicKey(), ""),
+
   // ── System ───────────────────────────────────────────────────────────────
   getStorageStats: (): Promise<BackendStorageStats> =>
     guard(() => WailsApp.GetStorageStats() as Promise<BackendStorageStats>, {

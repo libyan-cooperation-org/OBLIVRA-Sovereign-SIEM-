@@ -26,10 +26,16 @@ export default function MerkleExplorer() {
     const [verifying, setVerifying] = createSignal(false);
     const [chainValid, setChainValid] = createSignal<boolean | null>(null);
 
+    const [pubKey, setPubKey] = createSignal("");
+
     const load = async () => {
         setLoading(true);
-        const data = await api.listIntegrityBlocks(50);
+        const [data, key] = await Promise.all([
+            api.listIntegrityBlocks(50),
+            api.getForensicsPublicKey(),
+        ]);
         setBlocks(data ?? []);
+        setPubKey(key ?? "");
         setLoading(false);
     };
 
@@ -139,6 +145,19 @@ export default function MerkleExplorer() {
                     <p class="text-xs text-muted mt-1 uppercase tracking-wider">Chain Status</p>
                 </Card>
             </div>
+
+            {/* Public key card */}
+            <Show when={pubKey()}>
+                <Card class="p-4 flex items-start gap-4 border-emerald-500/20 bg-emerald-950/20">
+                    <div class="p-2 rounded-lg bg-emerald-500/10 text-emerald-400 mt-0.5">
+                        <Lock size={18} />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Ed25519 Signing Public Key (for external auditors)</p>
+                        <p class="text-[11px] font-mono text-muted break-all select-all">{pubKey()}</p>
+                    </div>
+                </Card>
+            </Show>
 
             {/* Block list */}
             <Card class="p-0 overflow-hidden">

@@ -58,9 +58,25 @@ const load = async (enabledOnly = false) => {
   }
 };
 
-// Local-only toggle (no backend mutation endpoint yet — can add later)
-const toggleRule = (id: string) => {
-  setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
+// Toggle a rule on/off — optimistically updates UI then persists to backend.
+const toggleRule = async (id: string) => {
+  // Optimistic update so the UI feels instant
+  let nextEnabled = false;
+  setRules(prev => prev.map(r => {
+    if (r.id === id) {
+      nextEnabled = !r.enabled;
+      return { ...r, enabled: nextEnabled };
+    }
+    return r;
+  }));
+  // Persist to backend (hot-reloads detection engine automatically)
+  try {
+    await api.toggleRule(id, nextEnabled);
+  } catch (err) {
+    // Roll back on failure
+    console.error("[rules] toggleRule failed:", err);
+    setRules(prev => prev.map(r => r.id === id ? { ...r, enabled: !r.enabled } : r));
+  }
 };
 
 export const rulesStore = {

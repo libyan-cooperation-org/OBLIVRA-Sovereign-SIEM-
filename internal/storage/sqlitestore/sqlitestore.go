@@ -182,6 +182,7 @@ CREATE TABLE IF NOT EXISTS fim_baselines (
     hash        TEXT NOT NULL,
     updated_at  INTEGER NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_fim_baselines_path ON fim_baselines(path);
 
 CREATE TABLE IF NOT EXISTS users (
     id            TEXT PRIMARY KEY,
@@ -874,6 +875,31 @@ func (s *DB) ListIntegrityBlocks(limit int) ([]*IntegrityBlockRecord, error) {
 	return blocks, rows.Err()
 }
 
+// ListIntegrityBlocks returns the most recent N integrity blocks ordered newest first.
+func (s *DB) ListIntegrityBlocks(limit int) ([]*IntegrityBlockRecord, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows, err := s.db.Query(`
+		SELECT id, root_hash, prev_hash, event_count, timestamp, signature
+		FROM integrity_blocks ORDER BY id DESC LIMIT ?`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var blocks []*IntegrityBlockRecord
+	for rows.Next() {
+		var b IntegrityBlockRecord
+		var ts int64
+		if err := rows.Scan(&b.ID, &b.RootHash, &b.PrevHash, &b.EventCount, &ts, &b.Signature); err != nil {
+			return nil, err
+		}
+		b.Timestamp = time.Unix(ts, 0)
+		blocks = append(blocks, &b)
+	}
+	return blocks, rows.Err()
+}
+
 // GetLastIntegrityBlock returns the most recent block recorded.
 func (s *DB) GetLastIntegrityBlock() (*IntegrityBlockRecord, error) {
 	row := s.db.QueryRow(`
@@ -1022,6 +1048,74 @@ func (s *DB) DeleteFimWatch(path string) error {
 	return err
 }
 
+// UpsertFimBaseline stores or updates the known-good hash for a file path.
+func (s *DB) UpsertFimBaseline(path, hash string) error {
+	_, err := s.db.Exec(
+		`INSERT OR REPLACE INTO fim_baselines (path, hash, updated_at) VALUES (?, ?, ?)`,
+		path, hash, time.Now().Unix(),
+	)
+	return err
+}
+
+// GetFimBaseline returns the stored hash for a path, or empty string if not found.
+func (s *DB) GetFimBaseline(path string) (string, error) {
+	var hash string
+	err := s.db.QueryRow(`SELECT hash FROM fim_baselines WHERE path = ?`, path).Scan(&hash)
+	if err == sql.ErrNoRows {
+		return "", nil
+	}
+	return hash, err
+}
+
+// ListIntegrityBlocks returns the most recent N forensics integrity blocks.
+func (s *DB) ListIntegrityBlocks(limit int) ([]*IntegrityBlockRecord, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows, err := s.db.Query(
+		`SELECT id, root_hash, prev_hash, event_count, timestamp, signature
+		 FROM integrity_blocks ORDER BY id DESC LIMIT ?`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var blocks []*IntegrityBlockRecord
+	for rows.Next() {
+		var b IntegrityBlockRecord
+		var ts int64
+		if err := rows.Scan(&b.ID, &b.RootHash, &b.PrevHash, &b.EventCount, &ts, &b.Signature); err != nil {
+			return nil, err
+		}
+		b.Timestamp = time.Unix(ts, 0)
+		blocks = append(blocks, &b)
+	}
+	return blocks, rows.Err()
+}
+
+// ─── FIM BASELINES ────────────────────────────────────────────────────────────
+// Baselines store the last-known SHA-256 hash for each watched path so FIM
+// can detect changes across restarts.
+
+// UpsertFimBaseline stores or updates the hash for a given path.
+func (s *DB) UpsertFimBaseline(path, hash string) error {
+	_, err := s.db.Exec(`
+		INSERT INTO fim_baselines (path, hash, updated_at) VALUES (?, ?, ?)
+		ON CONFLICT(path) DO UPDATE SET hash=excluded.hash, updated_at=excluded.updated_at`,
+		path, hash, time.Now().Unix())
+	return err
+}
+
+// GetFimBaseline returns the stored hash for a path, or empty string if not found.
+func (s *DB) GetFimBaseline(path string) (string, error) {
+	var hash string
+	err := s.db.QueryRow(`SELECT hash FROM fim_baselines WHERE path = ?`, path).Scan(&hash)
+	if err == sql.ErrNoRows {
+		return "", nil
+	}
+	return hash, err
+}
+
 // UpsertFimBaseline stores or updates the known-good hash for a path.
 func (s *DB) UpsertFimBaseline(path, hash string) error {
 	_, err := s.db.Exec(
@@ -1128,6 +1222,64 @@ func (s *DB) ListAuditLogs(limit int) ([]*AuditRecord, error) {
 // Close closes the underlying database connection.
 func (s *DB) Close() error {
 	return s.db.Close()
+}
+
+// DB returns the underlying *sql.DB for direct queries not covered by helpers.
+func (s *DB) DB() *sql.DB {
+	return s.db
+}
+
+// ─── INTEGRITY BLOCKS (LIST) ─────────────────────────────────────────────────
+
+// ListIntegrityBlocks returns the most recent N forensic integrity blocks.
+func (s *DB) ListIntegrityBlocks(limit int) ([]*IntegrityBlockRecord, error) {
+	if limit <= 0 {
+		limit = 50
+	}
+	rows, err := s.db.Query(`
+		SELECT id, root_hash, prev_hash, event_count, timestamp, signature
+		FROM integrity_blocks
+		ORDER BY id DESC LIMIT ?`, limit)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var blocks []*IntegrityBlockRecord
+	for rows.Next() {
+		var b IntegrityBlockRecord
+		var ts int64
+		if err := rows.Scan(&b.ID, &b.RootHash, &b.PrevHash, &b.EventCount, &ts, &b.Signature); err != nil {
+			return nil, err
+		}
+		b.Timestamp = time.Unix(ts, 0)
+		blocks = append(blocks, &b)
+	}
+	return blocks, rows.Err()
+}
+
+// ─── FIM BASELINES ────────────────────────────────────────────────────────────
+
+// UpsertFimBaseline stores the current SHA-256 hash for a watched path.
+func (s *DB) UpsertFimBaseline(path, hash string) error {
+	_, err := s.db.Exec(`
+		INSERT INTO fim_baselines (path, hash, updated_at)
+		VALUES (?, ?, ?)
+		ON CONFLICT(path) DO UPDATE SET hash = excluded.hash, updated_at = excluded.updated_at`,
+		path, hash, time.Now().Unix(),
+	)
+	return err
+}
+
+// GetFimBaseline retrieves the stored baseline hash for a path.
+// Returns empty string if no baseline exists yet.
+func (s *DB) GetFimBaseline(path string) (string, error) {
+	var hash string
+	err := s.db.QueryRow(`SELECT hash FROM fim_baselines WHERE path = ?`, path).Scan(&hash)
+	if err == sql.ErrNoRows {
+		return "", nil
+	}
+	return hash, err
 }
 
 func (s *DB) InsertSavedSearch(id, name, query, user string, created int64) error {

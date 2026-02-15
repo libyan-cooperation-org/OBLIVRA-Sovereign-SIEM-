@@ -30,6 +30,7 @@ const SecuritySettings = lazy(() => import("./pages/settings/tabs/SecuritySettin
 const IntegrationSettings = lazy(() => import("./pages/settings/tabs/IntegrationSettings"));
 const TeamSettings = lazy(() => import("./pages/settings/tabs/TeamSettings"));
 const SystemSettings = lazy(() => import("./pages/settings/tabs/SystemSettings"));
+const NotificationSettings = lazy(() => import("./pages/settings/tabs/NotificationSettings"));
 const OnboardingWizard = lazy(() => import("./pages/onboarding/OnboardingWizard"));
 const SearchPage = lazy(() => import("./pages/search/SearchPage"));
 const AgentDashboard = lazy(() => import("./pages/agents/AgentDashboard"));
@@ -67,6 +68,7 @@ function App() {
         <Route path="/appearance" component={AppearanceSettings} />
         <Route path="/security" component={SecuritySettings} />
         <Route path="/integrations" component={IntegrationSettings} />
+        <Route path="/notifications" component={NotificationSettings} />
         <Route path="/team" component={TeamSettings} />
         <Route path="/system" component={SystemSettings} />
       </Route>

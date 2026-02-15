@@ -17,7 +17,8 @@ import {
     Boxes,
     Cpu,
     Target,
-    Server
+    Server,
+    Mail
 } from "lucide-solid";
 
 const navItems = [
@@ -78,15 +79,23 @@ export const Sidebar = () => {
                 </For>
             </nav>
 
-            <div class="p-4 mt-auto border-t border-white/5">
-                <A
-                    href="/settings/appearance"
-                    class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-secondary hover:text-white hover:bg-white/5 transition-all"
-                    activeClass="bg-white/10 text-white"
-                >
-                    <Settings size={18} />
-                    <span>Settings</span>
-                </A>
+            <div class="p-4 mt-auto border-t border-white/5 space-y-1">
+            <A
+            href="/settings/appearance"
+            class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-secondary hover:text-white hover:bg-white/5 transition-all"
+            activeClass="bg-white/10 text-white"
+            >
+            <Settings size={18} />
+            <span>Settings</span>
+            </A>
+			<A
+				href="/settings/notifications"
+				class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm text-secondary hover:text-white hover:bg-white/5 transition-all"
+				activeClass="bg-white/10 text-white"
+			>
+				<Mail size={18} />
+				<span>Notifications</span>
+			</A>
                 <div class="mt-4 flex items-center gap-3 px-3 py-2">
                     <div class="w-8 h-8 rounded-full bg-gradient-to-br from-accent to-indigo-600 flex items-center justify-center text-xs font-bold ring-2 ring-white/10">
                         KA
